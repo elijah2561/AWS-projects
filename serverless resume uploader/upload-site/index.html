@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Resume Uploader</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #232f3e 0%, #131a22 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 500px;
+        animation: fadeInUp 0.8s ease-out;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+        color: white;
+      }
+
+      .aws-logo {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #ff9900;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .subtitle {
+        font-size: 1.1rem;
+        color: #aab7c4;
+        font-weight: 300;
+      }
+
+      .card {
+        background: white;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+          0 0 0 1px rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #ff9900, #ffb84d);
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+        position: relative;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #232f3e;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      input[type="text"],
+      input[type="email"] {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e1e8ed;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #fafbfc;
+      }
+
+      input[type="text"]:focus,
+      input[type="email"]:focus {
+        outline: none;
+        border-color: #ff9900;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.1);
+        transform: translateY(-1px);
+      }
+
+      .file-input-wrapper {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+      }
+
+      input[type="file"] {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+      }
+
+      .file-input-label {
+        display: block;
+        padding: 14px 16px;
+        border: 2px dashed #e1e8ed;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #fafbfc;
+        color: #666;
+      }
+
+      .file-input-label:hover {
+        border-color: #ff9900;
+        background: #fff8f0;
+        color: #ff9900;
+      }
+
+      .file-input-label.has-file {
+        border-color: #28a745;
+        background: #f8fff9;
+        color: #28a745;
+      }
+
+      .upload-btn {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #ff9900, #ffb84d);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        margin-top: 10px;
+      }
+
+      .upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 153, 0, 0.3);
+      }
+
+      .upload-btn:active {
+        transform: translateY(0);
+      }
+
+      .upload-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .loading {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+      }
+
+      #response {
+        margin-top: 20px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-weight: 500;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+      }
+
+      #response.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      #response.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      #response.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 600px) {
+        .card {
+          padding: 30px 20px;
+        }
+
+        .aws-logo {
+          font-size: 2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="aws-logo">AWS DEMO</div>
+        <div class="subtitle">Resume Uploader</div>
+      </div>
+
+      <div class="card">
+        <form id="uploadForm">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input
+              type="text"
+              id="name"
+              placeholder="Enter your full name"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="position">Position</label>
+            <input
+              type="text"
+              id="position"
+              placeholder="Position you're applying for"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="resume">Resume (PDF only)</label>
+            <div class="file-input-wrapper">
+              <input type="file" id="resume" accept=".pdf" required />
+              <label for="resume" class="file-input-label" id="fileLabel">
+                📄 Choose PDF file or drag & drop
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="upload-btn" id="submitBtn">
+            <span class="btn-text">Upload Resume</span>
+            <div class="loading">
+              <div class="spinner"></div>
+            </div>
+          </button>
+        </form>
+
+        <div id="response"></div>
+      </div>
+    </div>
+
+    <script>
+      const apiUrl =
+        "https://ovhmd8pfi8.execute-api.us-east-1.amazonaws.com/prod/resumes";
+
+      // File input handling
+      document
+        .getElementById("resume")
+        .addEventListener("change", function (e) {
+          const fileLabel = document.getElementById("fileLabel");
+          const file = e.target.files[0];
+
+          if (file) {
+            fileLabel.textContent = `✅ ${file.name}`;
+            fileLabel.classList.add("has-file");
+          } else {
+            fileLabel.textContent = "📄 Choose PDF file or drag & drop";
+            fileLabel.classList.remove("has-file");
+          }
+        });
+
+      // Form submission
+      document
+        .getElementById("uploadForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const submitBtn = document.getElementById("submitBtn");
+          const btnText = submitBtn.querySelector(".btn-text");
+          const loading = submitBtn.querySelector(".loading");
+          const response = document.getElementById("response");
+
+          // Show loading state
+          submitBtn.disabled = true;
+          btnText.style.opacity = "0";
+          loading.style.display = "block";
+          response.classList.remove("show", "success", "error");
+
+          try {
+            const file = document.getElementById("resume").files[0];
+            const reader = new FileReader();
+
+            reader.onload = async () => {
+              try {
+                const base64 = reader.result.split(",")[1];
+                const data = {
+                  name: document.getElementById("name").value,
+                  email: document.getElementById("email").value,
+                  position: document.getElementById("position").value,
+                  resume: base64,
+                };
+
+                const res = await fetch(apiUrl, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(data),
+                });
+
+                const result = await res.json();
+
+                // Check if response indicates success
+                const isSuccess =
+                  res.ok && !result.error && (result.message || result.success);
+
+                // Show response
+                response.textContent =
+                  result.message || result.error || "Upload complete!";
+                response.classList.add("show", isSuccess ? "success" : "error");
+
+                if (isSuccess) {
+                  document.getElementById("uploadForm").reset();
+                  document.getElementById("fileLabel").textContent =
+                    "📄 Choose PDF file or drag & drop";
+                  document
+                    .getElementById("fileLabel")
+                    .classList.remove("has-file");
+                }
+              } catch (error) {
+                response.textContent = "Upload failed. Please try again.";
+                response.classList.add("show", "error");
+              } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                btnText.style.opacity = "1";
+                loading.style.display = "none";
+              }
+            };
+
+            reader.readAsDataURL(file);
+          } catch (error) {
+            response.textContent = "Upload failed. Please try again.";
+            response.classList.add("show", "error");
+
+            // Reset button state
+            submitBtn.disabled = false;
+            btnText.style.opacity = "1";
+            loading.style.display = "none";
+          }
+        });
+    </script>
+  </body>
+</html>
