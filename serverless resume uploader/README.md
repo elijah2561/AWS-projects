@@ -94,8 +94,11 @@ Click Next
 Under Permissions, attach these AWS-managed policies:
 
 --AmazonS3FullAccess
+
 --AmazonDynamoDBFullAccess
+
 --AmazonSNSFullAccess
+
 --CloudWatchLogsFullAccess
 
 Click Next
@@ -126,10 +129,13 @@ SNS_TOPIC_ARN ARN of your SNS topic
 
 6️⃣ Add Code
 Check lambda_function.py in the project folder
+
 Deploy your code.
 
 Phase 3 — API Gateway Integration
+
 7️⃣ Create API
+
 Go to API Gateway → Create API
 
 Choose REST API → Build
@@ -159,6 +165,7 @@ Allow POST and OPTIONS
 Deploy API to stage: prod
 
 Phase 4 — Testing
+
 Test via Postman:
 
 POST → https://your-api-id.execute-api.us-east-1.amazonaws.com/prod/resumes
@@ -184,10 +191,13 @@ Body (raw JSON):
 
 Check:
 S3: file uploaded
+
 DynamoDB: new entry
+
 Email: SNS notification received
 
 Phase 5 — Frontend Hosting
+
 1️⃣ Create website bucket
 
 Name: resume-uploader-site-yourname
@@ -213,4 +223,5 @@ Allow public read:
 "Action": "s3:GetObject",
 "Resource": "arn:aws:s3:::resume-uploader-site-yourname/_"
 }
+
 Visit your website endpoint URL to view your website, upload a resume to test if its working.
